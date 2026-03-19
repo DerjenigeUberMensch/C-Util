@@ -1,1 +1,3 @@
 # C-Util
+
+MIT licensed util(s) for (mostly) unix based programming, however some can be used elsewhere taken apart etc...
