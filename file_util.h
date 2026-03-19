@@ -1,0 +1,217 @@
+/* MIT License
+ *
+ * Copyright (c) 2024 Joseph
+ * All rights reserved.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ *  The above copyright notice and this permission notice shall be included in all
+ *  copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+#ifndef __FILE__UTIL__H
+#define __FILE__UTIL__H
+
+#include <stdio.h>
+#include <stdbool.h>
+
+
+#ifndef __linux__
+#error "OS not supported functions may have undefined behaviour. "
+#endif
+
+
+enum
+{   
+    FFSysGetConfigPathLengthMAX = 
+    /* MAX_FILENAME */
+        255 *
+#ifdef __linux__
+        /* Assuming /home/user/.config/mydir/dirname/filename
+         * x * 2 to allow for upto x2 layers of config directories for wacky stuff
+         */
+        6
+#else
+        10
+#endif
+};
+
+
+/*
+ *
+ * NOTE: Guaranteed to be the same length as FFGetSysConfigPath()
+ * NOTE: Guaranteed to end with a backslash '/' for the path include length.
+ *
+ * RETURN: length of config path.
+ */
+size_t
+FFGetSysConfigPathLength(
+        void
+        );
+
+/*  
+ *
+ * NOTE: argument len_return does NOT include the null byte in its length calculation.
+ * NOTE: Recomended buff length FFSysGetConfigPathLengthMAX
+ *
+ * RETURN: EXIT_SUCCESS on Success.
+ * RETURN: EXIT_FAILURE on Failure.
+ */
+int
+FFGetSysConfigPath(
+        char *buff,
+        size_t buff_len,
+        size_t *len_return
+        );
+
+/* Directory checking checks if the specified directory exists. 
+ *
+ * RETURN: EXIT_SUCCESS on Success.
+ * RETURN: EXIT_FAILURE on Failure.
+ */
+int
+FFDirExists(
+        char *const DIR_NAME
+        );
+
+
+/* Creates a directory based on path.
+ *
+ * Ex: 
+ *      FFCreateDir("/home/user/.hidden_dir/other_dir/last_dir");
+ * 
+ * RETURN: EXIT_SUCCESS on Success.
+ * RETURN: EXIT_FAILURE on Failure.
+ */
+int
+FFCreateDir(
+        char *const DIR_NAME
+        );
+
+/* Creates a file and specified subdirectories if necessary.
+ *
+ * NOTE: ~ and ~/ are not supported /home/<user>/ must be used for FILE_NAME assuming home directory is meant.
+ * 
+ * EX:
+ *      FFCreateFile("/home/john/.config/johns_config_directory/johns_config_file.cfg");
+ *
+ *
+ * RETURN: EXIT_SUCCESS on Success.
+ * RETURN: EXIT_FAILURE on Failure.
+ */
+int
+FFCreatePath(
+        char *const FULL_PATH
+        );
+
+/* Path checking simply checks if the specified path exists, this does not care if its a directory or regular file.
+ *
+ * RETURN: 1 on Path Exists.
+ * RETURN: 0 on Path Doesnt Exists.
+ */
+int
+FFPathExists(
+        char *const FULL_PATH
+        );
+
+/* File checking checks if it exists via the specified path.
+ *
+ * RETURN: 1 on File Exists.
+ * RETURN: 0 on File Doesnt Exists.
+ */
+int
+FFFileExists(
+        char *const FILE_NAME
+        );
+
+/* Creates a file and specified subdirectories if necessary.
+ *
+ * NOTE: ~ and ~/ are not supported /home/<user>/ must be used for FILE_NAME assuming home directory is meant.
+ * 
+ * EX:
+ *      FFCreateFile("/home/john/.config/johns_config_directory/johns_config_file.cfg");
+ *
+ * RETURN: EXIT_SUCCESS on Success.
+ * RETURN: EXIT_FAILURE on Failure.
+ */
+int
+FFCreateFile(
+        char *const FILE_NAME
+        );
+
+/* Checks if a file is empty.
+ *
+ * NOTE: No safeguards if FILE_NAME is NULL.
+ *
+ * RETURN: 1 on File is Empty.
+ * RETURN: 0 on File is not Empty.
+ */
+int
+FFIsFileEmpty(
+        char *const FILE_NAME
+        );
+
+/* Gets a new line from a file (usually to read).
+ *
+ * RETURN: 1 on EOF
+ * RETURN: 0 on success
+ * RETURN: -1 on Overflow
+ * RETURN: -2 on Parser Error
+ */
+int
+FFGetNewLine(
+        FILE *f,
+        char *buff,
+        size_t buff_len
+        );
+
+/*
+ * RETURN: 0 on Success.
+ * RETURN: -1 on Failure.
+ */
+int
+FFLockFileRead(
+        int file_descriptor,
+        bool allow_blocking
+        );
+
+/*
+ * RETURN: 0 on Success.
+ * RETURN: -1 on Failure.
+ */
+int
+FFUnlockFileRead(
+        int file_descriptor
+        );
+
+/*
+ * RETURN: 0 on Success.
+ * RETURN: -1 on Failure.
+ */
+int
+FFLockFileWrite(
+        int file_descriptor,
+        bool allow_blocking
+        );
+/*
+ * RETURN: 0 on Success.
+ * RETURN: -1 on Failure.
+ */
+int
+FFUnlockFileWrite(
+        int file_descriptor
+        );
+
+#endif
